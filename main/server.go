@@ -2,11 +2,10 @@ package main
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/spf13/viper"
+	"go-chat-server/config"
 	"go-chat-server/db"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -26,7 +25,6 @@ var (
 	// client unique key
 	clientKey int16 = 1
 )
-var appViper = viper.New()
 
 // keep client connection
 func startConn(w http.ResponseWriter, r *http.Request) {
@@ -93,23 +91,9 @@ func sendMessage(conn *websocket.Conn, message string) {
 }
 
 func main() {
-	// init viper config
-	viperPath, err := os.Getwd()
-	if err != nil {
-		panic("Cannot get project path")
-	}
-	appViper.AddConfigPath(viperPath + string(os.PathSeparator) + "config")
-	appViper.SetConfigName("app")
-	appViper.SetConfigType("yaml")
-
-	if err := appViper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %s", err)
-	} else {
-		log.Printf("Using config file: %s", appViper.ConfigFileUsed())
-	}
-
 	// init db
-	db.InitDB(appViper)
+	config.LoadViper()
+	db.InitDB(config.AppViper)
 
 	// start server
 	http.HandleFunc("/ws", startConn)
