@@ -27,7 +27,6 @@ func InitDB(appViper *viper.Viper) {
 	db.SetConnMaxIdleTime(30 * time.Minute)
 
 	log.Println("Connect to chat db success")
-
 	log.Println("Auto migrate tables")
 	DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&api.User{})
 }
