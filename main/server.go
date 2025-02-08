@@ -2,8 +2,11 @@ package main
 
 import (
 	"github.com/gorilla/websocket"
+	"github.com/spf13/viper"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -23,6 +26,8 @@ var (
 	// client unique key
 	clientKey int16 = 1
 )
+var appViper = viper.New()
+var db *gorm.DB
 
 // keep client connection
 func startConn(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +36,12 @@ func startConn(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to connect server: %+v", err)
 		return
 	}
-	defer conn.Close()
+	defer func(conn *websocket.Conn) {
+		err := conn.Close()
+		if err != nil {
+			log.Printf("Error close conn: %v", err)
+		}
+	}(conn)
 	addGlobalConn(conn)
 
 	for {
@@ -83,7 +93,33 @@ func sendMessage(conn *websocket.Conn, message string) {
 	log.Printf("Send {%s} to client success", message)
 }
 
+// init db
+//func initDB() {
+//	var err error
+//	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+//
+//	if err != nil {
+//		panic("failed to connect chat db")
+//	}
+//}
+
 func main() {
+	// init viper config
+	viperPath, err := os.Getwd()
+	if err != nil {
+		panic("Cannot get project path")
+	}
+	appViper.AddConfigPath(viperPath + string(os.PathSeparator) + "config")
+	appViper.SetConfigName("app")
+	appViper.SetConfigType("yaml")
+
+	if err := appViper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	} else {
+		log.Printf("Using config file: %s", appViper.ConfigFileUsed())
+	}
+
+	// start server
 	http.HandleFunc("/ws", startConn)
 	log.Printf("Websocket server started on 127.0.0.1:8080")
 	_ = http.ListenAndServe(":8080", nil)
