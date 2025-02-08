@@ -1,5 +1,5 @@
 db:
   mysql:
-    dsn:  "user:password@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn:  "root:root@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local"
     maxOpenConn: 10
     maxIdleConn: 10

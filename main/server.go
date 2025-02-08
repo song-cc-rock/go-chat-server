@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
-	"gorm.io/gorm"
+	"go-chat-server/db"
 	"log"
 	"net/http"
 	"os"
@@ -27,7 +27,6 @@ var (
 	clientKey int16 = 1
 )
 var appViper = viper.New()
-var db *gorm.DB
 
 // keep client connection
 func startConn(w http.ResponseWriter, r *http.Request) {
@@ -93,16 +92,6 @@ func sendMessage(conn *websocket.Conn, message string) {
 	log.Printf("Send {%s} to client success", message)
 }
 
-// init db
-//func initDB() {
-//	var err error
-//	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-//
-//	if err != nil {
-//		panic("failed to connect chat db")
-//	}
-//}
-
 func main() {
 	// init viper config
 	viperPath, err := os.Getwd()
@@ -118,6 +107,9 @@ func main() {
 	} else {
 		log.Printf("Using config file: %s", appViper.ConfigFileUsed())
 	}
+
+	// init db
+	db.InitDB(appViper)
 
 	// start server
 	http.HandleFunc("/ws", startConn)
