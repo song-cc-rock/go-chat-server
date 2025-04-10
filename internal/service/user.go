@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"go-chat-server/internal/repo"
+	"go-chat-server/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -30,5 +31,9 @@ func (u *userService) GenerateToken(ctx context.Context, email string) (string, 
 		}
 	}
 	// Generate a token for the user
-
+	token, err := utils.GenerateToken(user.ID)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

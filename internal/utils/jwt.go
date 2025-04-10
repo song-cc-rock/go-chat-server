@@ -1,4 +1,4 @@
-package middleware
+package utils
 
 import (
 	"github.com/golang-jwt/jwt/v5"
@@ -11,7 +11,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func generateToken(userId string) (string, error) {
+func GenerateToken(userId string) (string, error) {
 	expired := time.Now().Add(2 * time.Hour)
 	claims := &Claims{
 		UserId: userId,
@@ -23,4 +23,17 @@ func generateToken(userId string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(config.GetString("jwt.secret"))
+}
+
+func ParseToken(tokenStr string) (*Claims, error) {
+	claims := &Claims{}
+
+	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
+		return config.GetString("jwt.secret"), nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, err
+	}
+	return claims, nil
 }
