@@ -16,10 +16,14 @@ type userService struct {
 	userRepo repo.UserRepository
 }
 
+func NewUserService(userRepo repo.UserRepository) UserService {
+	return &userService{userRepo}
+}
+
 func (u *userService) GenerateToken(ctx context.Context, email string) (string, error) {
 	user, err := u.userRepo.GetByMail(ctx, email)
 	if err != nil {
-		if errors.As(err, gorm.ErrRecordNotFound) {
+		if errors.As(err, &gorm.ErrRecordNotFound) {
 			// User not found, create a new user
 			user, err = u.userRepo.CreateUserByMail(ctx, email)
 			if err != nil {

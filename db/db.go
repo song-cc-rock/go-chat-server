@@ -34,7 +34,6 @@ func InitDB() {
 }
 
 func InitTable(db *gorm.DB) {
-	log.Println("Migrate user table")
 	err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.User{}, &model.Group{})
 	if err != nil {
 		return

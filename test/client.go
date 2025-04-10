@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"go-chat-server/api"
+	"go-chat-server/internal/model"
 	"log"
 	"os"
 )
@@ -19,7 +19,7 @@ func main() {
 	defer conn.Close()
 	go func() {
 		for {
-			var msg api.Message
+			var msg model.Message
 			err := conn.ReadJSON(&msg)
 			if err != nil {
 				log.Println("Error reading message: ", err)
@@ -36,7 +36,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		message := scanner.Text()
-		msg := api.Message{Sender: name, Content: message}
+		msg := model.Message{Sender: name, Content: message}
 		err := conn.WriteJSON(msg)
 		if err != nil {
 			log.Println("Error sending message:", err)

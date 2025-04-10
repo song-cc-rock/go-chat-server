@@ -1,4 +1,4 @@
-package api
+package model
 
 type Message struct {
 	Sender    string `json:"sender"`    // send username

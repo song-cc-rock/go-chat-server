@@ -34,10 +34,11 @@ func (r *userRepository) CreateUserByMail(ctx context.Context, email string) (*m
 	user := &model.User{
 		ID:       uuid.NewString(),
 		Mail:     email,
+		Name:     email,
 		NickName: utils.GenerateUsername(8),
 		Password: utils.ToHash("123456"),
 	}
-	if err := r.db.WithContext(ctx).Create(user).Error; err != nil {
+	if err := r.db.WithContext(ctx).Omit("Phone").Create(user).Error; err != nil {
 		return nil, fmt.Errorf("failed to create user by email: %v", err)
 	}
 	return user, nil
