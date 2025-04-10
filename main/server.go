@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gorilla/websocket"
-	"go-chat-server/config"
 	"go-chat-server/db"
+	"go-chat-server/internal/service"
 	"log"
 	"net/http"
 	"strconv"
@@ -92,11 +92,16 @@ func sendMessage(conn *websocket.Conn, message string) {
 
 func main() {
 	// init db
-	config.LoadViper()
-	db.InitDB(config.AppViper)
+	db.InitDB()
 
 	// start server
-	http.HandleFunc("/ws", startConn)
-	log.Printf("Websocket server started on 127.0.0.1:8080")
-	_ = http.ListenAndServe(":8080", nil)
+	//http.HandleFunc("/ws", startConn)
+	//log.Printf("Websocket server started on 127.0.0.1:8080")
+	//_ = http.ListenAndServe(":8080", nil)
+
+	emailService := service.NewEmailService()
+	err := emailService.SendVerifyCode("18971696254@163.com")
+	if err != nil {
+		log.Printf("Send email error: %v", err)
+	}
 }

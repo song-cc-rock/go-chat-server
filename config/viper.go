@@ -8,8 +8,7 @@ import (
 
 var AppViper = viper.New()
 
-func LoadViper() {
-	// init viper config
+func init() {
 	viperPath, err := os.Getwd()
 	if err != nil {
 		panic("Cannot get project path")
@@ -23,4 +22,12 @@ func LoadViper() {
 	} else {
 		log.Printf("Using config file: %s", AppViper.ConfigFileUsed())
 	}
+}
+
+func GetString(key string) string {
+	return AppViper.GetString(key)
+}
+
+func GetInt(key string) int {
+	return AppViper.GetInt(key)
 }

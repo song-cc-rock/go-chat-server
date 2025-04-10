@@ -1,5 +1,13 @@
+mail:
+  smtp:
+    host: "smtp.163.com"
+    port: "25"
+    username: "gochat2025@163.com"
+    auth_code: "AGb9N6LbhrJnsXc7"
 db:
   mysql:
     dsn:  "root:root@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=True&loc=Local"
     maxOpenConn: 10
     maxIdleConn: 10
+jwt:
+  secret: "gochat2025"
