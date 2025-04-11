@@ -12,7 +12,7 @@ import (
 
 type UserRepository interface {
 	GetByMail(ctx context.Context, email string) (*model.User, error)
-	CreateUserByMail(ctx context.Context, email string) (*model.User, error)
+	CreateUserByMail(ctx context.Context, email string, firstPwd string) (*model.User, error)
 }
 
 type userRepository struct {
@@ -31,13 +31,17 @@ func (r *userRepository) GetByMail(ctx context.Context, email string) (*model.Us
 	return user, nil
 }
 
-func (r *userRepository) CreateUserByMail(ctx context.Context, email string) (*model.User, error) {
+func (r *userRepository) CreateUserByMail(ctx context.Context, email string, firstPwd string) (*model.User, error) {
 	user := &model.User{
 		ID:       uuid.NewString(),
 		Mail:     email,
 		Name:     email,
 		NickName: utils2.GenerateUsername(8),
-		Password: utils2.ToHash("123456"),
+	}
+	if firstPwd != "" {
+		user.Password = utils2.ToHash(firstPwd)
+	} else {
+		user.Password = utils2.ToHash("123456")
 	}
 	if err := r.db.WithContext(ctx).Omit("Phone").Create(user).Error; err != nil {
 		return nil, fmt.Errorf("failed to create user by email: %v", err)

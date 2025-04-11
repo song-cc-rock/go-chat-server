@@ -14,7 +14,8 @@ func Init(registerHandler *handler.RegisterHandler) *gin.Engine {
 	{
 		// User registration and login routes
 		v1.POST("/send-verify-code", registerHandler.SendVerifyCode)
-		v1.POST("/login-with-code", registerHandler.LoginByVerifyCode)
+		v1.POST("/register", registerHandler.RegisterNewUser)
+		v1.POST("/login", registerHandler.LoginByPwd)
 	}
 
 	return r

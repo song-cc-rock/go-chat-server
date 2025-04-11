@@ -34,10 +34,15 @@ func (r *RegisterHandler) SendVerifyCode(ctx *gin.Context) {
 	v1.HandleSuccess(ctx, "Verify code send successfully")
 }
 
-func (r *RegisterHandler) LoginByVerifyCode(ctx *gin.Context) {
-	var req v1.LoginByCodeRequest
+func (r *RegisterHandler) RegisterNewUser(ctx *gin.Context) {
+	var req v1.RegisterByCodeRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, "Invalid parameter, mail or code cannot be null")
+		v1.HandleError(ctx, http.StatusBadRequest, "Invalid parameter")
+		return
+	}
+
+	if !r.userService.IsNewUser(ctx, req.Mail) {
+		v1.HandleError(ctx, http.StatusBadRequest, "This email is already registered")
 		return
 	}
 
@@ -46,9 +51,25 @@ func (r *RegisterHandler) LoginByVerifyCode(ctx *gin.Context) {
 		return
 	}
 
-	token, err := r.userService.GenerateToken(ctx, req.Mail)
+	user, err := r.userService.RegisterNewUser(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusUnauthorized, err.Error())
+		v1.HandleError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	v1.HandleSuccess(ctx, user.NickName)
+}
+
+func (r *RegisterHandler) LoginByPwd(ctx *gin.Context) {
+	var req v1.LoginByPwdRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, "Invalid parameter, mail or password cannot be null")
+		return
+	}
+
+	token := r.userService.VerifyPwdWithToken(ctx, &req)
+	if token == "" {
+		v1.HandleError(ctx, http.StatusUnauthorized, "Invalid email or password")
 		return
 	}
 

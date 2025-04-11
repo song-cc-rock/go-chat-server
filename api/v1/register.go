@@ -4,9 +4,15 @@ type SendVerifyCodeRequest struct {
 	Mail string `json:"mail" binding:"required"`
 }
 
-type LoginByCodeRequest struct {
-	Mail string `json:"mail" binding:"required"`
-	Code string `json:"code" binding:"required"`
+type RegisterByCodeRequest struct {
+	Mail     string `json:"mail" binding:"required"`
+	Code     string `json:"code" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type LoginByPwdRequest struct {
+	Mail     string `json:"mail" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type LoginResponse struct {
