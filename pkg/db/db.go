@@ -1,8 +1,8 @@
 package db
 
 import (
-	"go-chat-server/config"
 	"go-chat-server/internal/model"
+	"go-chat-server/pkg/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -27,13 +27,13 @@ func InitDB() {
 	db.SetConnMaxIdleTime(30 * time.Minute)
 
 	log.Println("Connect to chat db success")
-	log.Println("Auto migrate tables")
 
 	// init table
 	InitTable(DB)
 }
 
 func InitTable(db *gorm.DB) {
+	log.Println("Auto migrate tables")
 	err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.User{}, &model.Group{})
 	if err != nil {
 		return

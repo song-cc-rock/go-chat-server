@@ -1,4 +1,4 @@
-package handle
+package handler
 
 import (
 	"github.com/gin-gonic/gin"
@@ -10,6 +10,13 @@ import (
 type RegisterHandler struct {
 	emailService service.EmailService
 	userService  service.UserService
+}
+
+func NewRegisterHandler() *RegisterHandler {
+	return &RegisterHandler{
+		emailService: service.NewEmailService(),
+		userService:  service.NewUserService(),
+	}
 }
 
 func (r *RegisterHandler) SendVerifyCode(ctx *gin.Context) {

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"go-chat-server/internal/model"
-	"go-chat-server/internal/utils"
+	"go-chat-server/pkg/db"
+	utils2 "go-chat-server/pkg/utils"
 	"gorm.io/gorm"
 )
 
@@ -18,8 +19,8 @@ type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepository{db}
+func NewUserRepository() UserRepository {
+	return &userRepository{db.DB}
 }
 
 func (r *userRepository) GetByMail(ctx context.Context, email string) (*model.User, error) {
@@ -35,8 +36,8 @@ func (r *userRepository) CreateUserByMail(ctx context.Context, email string) (*m
 		ID:       uuid.NewString(),
 		Mail:     email,
 		Name:     email,
-		NickName: utils.GenerateUsername(8),
-		Password: utils.ToHash("123456"),
+		NickName: utils2.GenerateUsername(8),
+		Password: utils2.ToHash("123456"),
 	}
 	if err := r.db.WithContext(ctx).Omit("Phone").Create(user).Error; err != nil {
 		return nil, fmt.Errorf("failed to create user by email: %v", err)

@@ -1,8 +1,8 @@
-package utils
+package jwt
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	"go-chat-server/config"
+	"go-chat-server/pkg/config"
 	"time"
 )
 

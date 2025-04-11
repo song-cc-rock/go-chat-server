@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/jordan-wright/email"
 	"github.com/patrickmn/go-cache"
-	"go-chat-server/config"
-	"go-chat-server/internal/utils"
+	"go-chat-server/pkg/config"
+	"go-chat-server/pkg/utils"
 	"net/smtp"
 	"time"
 )

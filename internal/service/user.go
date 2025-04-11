@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"go-chat-server/internal/repo"
-	"go-chat-server/internal/utils"
+	"go-chat-server/pkg/jwt"
 	"gorm.io/gorm"
 )
 
@@ -16,8 +16,8 @@ type userService struct {
 	userRepo repo.UserRepository
 }
 
-func NewUserService(userRepo repo.UserRepository) UserService {
-	return &userService{userRepo}
+func NewUserService() UserService {
+	return &userService{repo.NewUserRepository()}
 }
 
 func (u *userService) GenerateToken(ctx context.Context, email string) (string, error) {
@@ -35,7 +35,7 @@ func (u *userService) GenerateToken(ctx context.Context, email string) (string, 
 		}
 	}
 	// Generate a token for the user
-	token, err := utils.GenerateToken(user.ID)
+	token, err := jwt.GenerateToken(user.ID)
 	if err != nil {
 		return "", err
 	}
