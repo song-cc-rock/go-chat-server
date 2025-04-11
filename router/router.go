@@ -13,7 +13,7 @@ func Init(registerHandler *handler.RegisterHandler) *gin.Engine {
 	v1 := r.Group("/v1")
 	{
 		// User registration and login routes
-		v1.POST("/send-verify-code", registerHandler.SendVerifyCode)
+		v1.POST("/send-code", registerHandler.SendVerifyCode)
 		v1.POST("/register", registerHandler.RegisterNewUser)
 		v1.POST("/login", registerHandler.LoginByPwd)
 	}
