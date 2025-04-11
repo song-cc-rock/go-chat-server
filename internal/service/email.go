@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	verifyCodeCache = cache.New(2*time.Minute, 5*time.Minute)
+	verifyCodeCache = cache.New(1*time.Minute, 5*time.Minute)
 )
 
 type EmailService interface {

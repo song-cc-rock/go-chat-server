@@ -31,7 +31,7 @@ func (r *RegisterHandler) SendVerifyCode(ctx *gin.Context) {
 		return
 	}
 
-	v1.HandleSuccess(ctx, "Verify code sent successfully")
+	v1.HandleSuccess(ctx, "Verify code send successfully")
 }
 
 func (r *RegisterHandler) LoginByVerifyCode(ctx *gin.Context) {
