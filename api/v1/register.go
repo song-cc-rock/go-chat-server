@@ -14,7 +14,3 @@ type LoginByPwdRequest struct {
 	Mail     string `json:"mail" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
-
-type LoginResponse struct {
-	AccessToken string `json:"accessToken"`
-}

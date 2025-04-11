@@ -73,7 +73,5 @@ func (r *RegisterHandler) LoginByPwd(ctx *gin.Context) {
 		return
 	}
 
-	v1.HandleSuccess(ctx, v1.LoginResponse{
-		AccessToken: token,
-	})
+	v1.HandleSuccess(ctx, token)
 }
