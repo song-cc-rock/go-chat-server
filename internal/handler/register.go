@@ -22,7 +22,7 @@ func NewRegisterHandler() *RegisterHandler {
 func (r *RegisterHandler) SendVerifyCode(ctx *gin.Context) {
 	var req v1.SendVerifyCodeRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, err.Error())
+		v1.HandleError(ctx, http.StatusBadRequest, "Invalid parameter, mail cannot be null")
 		return
 	}
 
@@ -37,7 +37,7 @@ func (r *RegisterHandler) SendVerifyCode(ctx *gin.Context) {
 func (r *RegisterHandler) LoginByVerifyCode(ctx *gin.Context) {
 	var req v1.LoginByCodeRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, err.Error())
+		v1.HandleError(ctx, http.StatusBadRequest, "Invalid parameter, mail or code cannot be null")
 		return
 	}
 

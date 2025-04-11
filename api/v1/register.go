@@ -1,14 +1,14 @@
 package v1
 
 type SendVerifyCodeRequest struct {
-	Mail string `json:"mail" binding:"required,mail"`
+	Mail string `json:"mail" binding:"required"`
 }
 
 type LoginByCodeRequest struct {
-	Mail string `json:"mail" binding:"required,mail"`
-	Code string `json:"code" binding:"required,code"`
+	Mail string `json:"mail" binding:"required"`
+	Code string `json:"code" binding:"required"`
 }
 
 type LoginResponse struct {
-	AccessToken string `json:"token"`
+	AccessToken string `json:"accessToken"`
 }

@@ -8,7 +8,7 @@ import (
 
 func Init(registerHandler *handler.RegisterHandler) *gin.Engine {
 	log.Println("Initializing router...")
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	v1 := r.Group("/v1")
 	{
