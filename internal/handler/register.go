@@ -34,6 +34,10 @@ func (r *RegisterHandler) SendVerifyCode(ctx *gin.Context) {
 	v1.HandleSuccess(ctx, "success")
 }
 
+func (r *RegisterHandler) TestToken(ctx *gin.Context) {
+	v1.HandleSuccess(ctx, "token ok")
+}
+
 func (r *RegisterHandler) RegisterNewUser(ctx *gin.Context) {
 	var req v1.RegisterByCodeRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

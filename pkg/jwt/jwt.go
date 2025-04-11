@@ -29,7 +29,7 @@ func ParseToken(tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return config.GetString("jwt.secret"), nil
+		return []byte(config.GetString("jwt.secret")), nil
 	})
 
 	if err != nil || !token.Valid {
