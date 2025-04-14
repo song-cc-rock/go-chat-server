@@ -14,3 +14,8 @@ db:
     maxIdleConn: 10
 jwt:
   secret: "gochat2025"
+oauth:
+  github:
+    client_id: "Ov23liRJAg1oNDP6IWTA"
+    client_secret: "141dd2cd95e0c3e3e7a7aa2f73ed297c1b348643"
+    redirect_uri: "http://localhost:8080/oauth/github"

@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func Init(registerHandler *handler.RegisterHandler) *gin.Engine {
+func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler) *gin.Engine {
 	log.Println("Initializing router...")
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
@@ -16,6 +16,7 @@ func Init(registerHandler *handler.RegisterHandler) *gin.Engine {
 	r.POST("/send-code", registerHandler.SendVerifyCode)
 	r.POST("/register", registerHandler.RegisterNewUser)
 	r.POST("/login", registerHandler.LoginByPwd)
+	r.POST("/auth-url", authHandler.GetAuthCodeUrl)
 
 	v1 := r.Group("/v1", middleware.JWTAuthMiddleware())
 	{
