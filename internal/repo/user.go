@@ -13,6 +13,8 @@ import (
 type UserRepository interface {
 	GetByMail(ctx context.Context, email string) (*model.User, error)
 	CreateUserByMail(ctx context.Context, email string, firstPwd string) (*model.User, error)
+	GetByGithubId(githubId int64) (*model.User, error)
+	CreateGithubUser(githubUser map[string]interface{}) (*model.User, error)
 }
 
 type userRepository struct {
@@ -44,6 +46,29 @@ func (r *userRepository) CreateUserByMail(ctx context.Context, email string, fir
 		user.Password = utils2.ToHash("123456")
 	}
 	if err := r.db.WithContext(ctx).Omit("Phone").Create(user).Error; err != nil {
+		return nil, fmt.Errorf("failed to create user by email: %v", err)
+	}
+	return user, nil
+}
+
+func (r *userRepository) GetByGithubId(githubId int64) (*model.User, error) {
+	user := &model.User{}
+	if err := r.db.Where("github_id = ?", githubId).First(user).Error; err != nil {
+		return nil, fmt.Errorf("failed to get user by github id: %v", err)
+	}
+	return user, nil
+}
+
+func (r *userRepository) CreateGithubUser(githubUser map[string]interface{}) (*model.User, error) {
+	user := &model.User{
+		ID:       uuid.NewString(),
+		Mail:     githubUser["email"].(string),
+		Name:     githubUser["name"].(string),
+		Avatar:   githubUser["avatar_url"].(string),
+		NickName: utils2.GenerateUsername(8),
+	}
+	user.Password = utils2.ToHash("123456")
+	if err := r.db.Omit("Phone").Create(user).Error; err != nil {
 		return nil, fmt.Errorf("failed to create user by email: %v", err)
 	}
 	return user, nil

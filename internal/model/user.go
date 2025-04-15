@@ -8,6 +8,7 @@ type User struct {
 	Mail     string `gorm:"type:varchar(50);"`                    // mail
 	Password string `gorm:"type:varchar(255);not null"`           // password
 	Avatar   string `gorm:"type:varchar(100);"`                   // avatar
+	GithubId int64  `gorm:"type:int(11);"`                        // github id
 }
 
 // TableName set table name
