@@ -63,9 +63,9 @@ func (r *userRepository) CreateGithubUser(githubUser map[string]interface{}) (*m
 	user := &model.User{
 		ID:       uuid.NewString(),
 		Mail:     githubUser["email"].(string),
-		Name:     githubUser["name"].(string),
+		Name:     githubUser["email"].(string),
 		Avatar:   githubUser["avatar_url"].(string),
-		NickName: utils2.GenerateUsername(8),
+		NickName: githubUser["name"].(string),
 	}
 	user.Password = utils2.ToHash("123456")
 	if err := r.db.Omit("Phone").Create(user).Error; err != nil {

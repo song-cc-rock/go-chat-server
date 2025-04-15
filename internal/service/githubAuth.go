@@ -22,7 +22,9 @@ type githubService struct {
 }
 
 func NewGithubService() GithubService {
-	return &githubService{}
+	return &githubService{
+		userRepo: repo.NewUserRepository(),
+	}
 }
 
 func (a *githubService) GetAuthCodeUrl() (string, error) {
