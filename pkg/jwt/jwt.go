@@ -25,7 +25,7 @@ func GenerateToken(userId string) (string, error) {
 	return token.SignedString([]byte(config.GetString("jwt.secret")))
 }
 
-func ParseToken(tokenStr string) (*Claims, error) {
+func ParseToken(tokenStr string) (string, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
@@ -33,7 +33,7 @@ func ParseToken(tokenStr string) (*Claims, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return nil, err
+		return "", err
 	}
-	return claims, nil
+	return claims.UserId, nil
 }

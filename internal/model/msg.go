@@ -1,8 +1,8 @@
 package model
 
 type Message struct {
-	Sender    string `json:"sender"`    // send username
-	ClientId  string `json:"clientId"`  // client uuid
-	Recipient string `json:"recipient"` // recipient username
-	Content   string `json:"content"`
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Content string `json:"content"`
+	Time    int64  `json:"time"`
 }

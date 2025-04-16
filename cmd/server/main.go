@@ -5,6 +5,7 @@ import (
 	"go-chat-server/pkg/config"
 	"go-chat-server/pkg/db"
 	"go-chat-server/router"
+	"go-chat-server/ws"
 	"log"
 )
 
@@ -12,9 +13,14 @@ func main() {
 	// init db
 	db.InitDB()
 
-	// start http server
-	r := router.Init(handler.NewRegisterHandler(), handler.NewAuthHandler())
+	// init chat hub
+	hub := ws.NewHub()
+	go hub.Run()
+
+	// start http server or ws server
+	r := router.Init(handler.NewRegisterHandler(), handler.NewAuthHandler(), hub)
 	addr := config.GetString("server.host") + ":" + config.GetString("server.port")
 	_ = r.Run(addr)
+
 	log.Println("Server started at " + addr)
 }
