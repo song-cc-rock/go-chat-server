@@ -19,3 +19,7 @@ oauth:
     client_id: "Ov23liRJAg1oNDP6IWTA"
     client_secret: "141dd2cd95e0c3e3e7a7aa2f73ed297c1b348643"
     redirect_uri: "http://localhost:8080/oauth/github"
+  wechat:
+    app_id: "wx4f30218dee2d16fd"
+    app_secret: "c073919f5ddeea6b64376548836e2a75"
+    redirect_uri: "http://localhost:8080/oauth/wechat"

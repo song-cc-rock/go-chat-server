@@ -13,7 +13,7 @@ func main() {
 	db.InitDB()
 
 	// start http server
-	r := router.Init(handler.NewRegisterHandler(), handler.NewGithubHandler())
+	r := router.Init(handler.NewRegisterHandler(), handler.NewAuthHandler())
 	addr := config.GetString("server.host") + ":" + config.GetString("server.port")
 	_ = r.Run(addr)
 	log.Println("Server started at " + addr)

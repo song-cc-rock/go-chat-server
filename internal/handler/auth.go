@@ -7,17 +7,17 @@ import (
 	"net/http"
 )
 
-type GithubHandler struct {
+type AuthHandler struct {
 	githubService service.GithubService
 }
 
-func NewGithubHandler() *GithubHandler {
-	return &GithubHandler{
+func NewAuthHandler() *AuthHandler {
+	return &AuthHandler{
 		githubService: service.NewGithubService(),
 	}
 }
 
-func (r *GithubHandler) GetAuthCodeUrl(ctx *gin.Context) {
+func (r *AuthHandler) GetGithubAuthCodeUrl(ctx *gin.Context) {
 	url, err := r.githubService.GetAuthCodeUrl()
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err.Error())
@@ -27,7 +27,7 @@ func (r *GithubHandler) GetAuthCodeUrl(ctx *gin.Context) {
 	v1.HandleSuccess(ctx, url)
 }
 
-func (r *GithubHandler) AuthAndGetToken(ctx *gin.Context) {
+func (r *AuthHandler) AuthGithubAndGetToken(ctx *gin.Context) {
 	code, _ := ctx.GetQuery("code")
 	if code == "" {
 		v1.HandleError(ctx, http.StatusBadRequest, "第三方认证失败, 参数异常")

@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func Init(registerHandler *handler.RegisterHandler, githubHandler *handler.GithubHandler) *gin.Engine {
+func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler) *gin.Engine {
 	log.Println("Initializing router...")
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
@@ -16,8 +16,8 @@ func Init(registerHandler *handler.RegisterHandler, githubHandler *handler.Githu
 	r.POST("/send-code", registerHandler.SendVerifyCode)
 	r.POST("/register", registerHandler.RegisterNewUser)
 	r.POST("/login", registerHandler.LoginByPwd)
-	r.GET("/github/auth-url", githubHandler.GetAuthCodeUrl)
-	r.GET("/oauth/github", githubHandler.AuthAndGetToken)
+	r.GET("/github/auth-url", authHandler.GetGithubAuthCodeUrl)
+	r.GET("/oauth/github", authHandler.AuthGithubAndGetToken)
 
 	v1 := r.Group("/v1", middleware.JWTAuthMiddleware())
 	{
