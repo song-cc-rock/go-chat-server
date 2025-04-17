@@ -31,7 +31,7 @@ func (m *messageRepository) SaveMsgToDB(message *v1.ChatMessage) (*model.Message
 		Content:   message.Content,
 		MsgType:   "text",
 		Status:    "sent",
-		CreatedAt: message.Time,
+		CreatedAt: message.CreatedAt,
 	}
 	if err := m.db.Create(msg).Error; err != nil {
 		return nil, err

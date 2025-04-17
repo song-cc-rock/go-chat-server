@@ -12,6 +12,7 @@ import (
 
 type UserRepository interface {
 	GetByMail(ctx context.Context, email string) (*model.User, error)
+	GetById(ctx context.Context, id string) (*model.User, error)
 	CreateUserByMail(ctx context.Context, email string, firstPwd string) (*model.User, error)
 	GetByGithubId(githubId int64) (*model.User, error)
 	CreateGithubUser(githubUser map[string]interface{}) (*model.User, error)
@@ -28,6 +29,14 @@ func NewUserRepository() UserRepository {
 func (r *userRepository) GetByMail(ctx context.Context, email string) (*model.User, error) {
 	user := &model.User{}
 	if err := r.db.WithContext(ctx).Where("mail = ?", email).First(user).Error; err != nil {
+		return nil, fmt.Errorf("failed to get user by mail: %v", err)
+	}
+	return user, nil
+}
+
+func (r *userRepository) GetById(ctx context.Context, id string) (*model.User, error) {
+	user := &model.User{}
+	if err := r.db.WithContext(ctx).Where("id = ?", id).First(user).Error; err != nil {
 		return nil, fmt.Errorf("failed to get user by mail: %v", err)
 	}
 	return user, nil

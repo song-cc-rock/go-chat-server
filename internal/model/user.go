@@ -1,14 +1,14 @@
 package model
 
 type User struct {
-	ID       string `gorm:"type:varchar(50);not null;primarykey"` // id
-	Name     string `gorm:"type:varchar(255);not null;"`          // name
-	NickName string `gorm:"type:varchar(255);not null;"`          // nickname
-	Phone    string `gorm:"type:int(11);"`                        // phone
-	Mail     string `gorm:"type:varchar(50);"`                    // mail
-	Password string `gorm:"type:varchar(255);not null"`           // password
-	Avatar   string `gorm:"type:varchar(100);"`                   // avatar
-	GithubId int64  `gorm:"type:int(11);"`                        // github id
+	ID       string `gorm:"type:varchar(50);not null;primarykey"` // ID
+	Name     string `gorm:"type:varchar(255);not null;"`          // 账户名
+	NickName string `gorm:"type:varchar(255);not null;"`          // 用户名
+	Phone    string `gorm:"type:int(11);"`                        // 电话
+	Mail     string `gorm:"type:varchar(50);"`                    // 邮箱
+	Password string `gorm:"type:varchar(255);not null"`           // 密码
+	Avatar   string `gorm:"type:varchar(100);"`                   // 头像
+	GithubId int64  `gorm:"type:int(11);"`                        // Github ID
 }
 
 // TableName set table name

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	v1 "go-chat-server/api/v1"
 	"go-chat-server/internal/model"
 	"go-chat-server/internal/repo"
 	"go-chat-server/pkg/config"
@@ -57,7 +58,7 @@ func (a *githubService) AuthAndGetToken(code string) string {
 	return token
 }
 
-func getAccessToken(code string) (*model.Token, error) {
+func getAccessToken(code string) (*v1.Token, error) {
 	accessTokenUrl := "https://github.com/login/oauth/access_token"
 	data := url.Values{}
 	data.Set("client_id", config.GetString("oauth.github.client_id"))
@@ -79,17 +80,17 @@ func getAccessToken(code string) (*model.Token, error) {
 		return nil, err
 	}
 
-	var token model.Token
+	var token *v1.Token
 	if err = json.NewDecoder(res.Body).Decode(&token); err != nil {
 		return nil, err
 	}
 	if token.AccessToken == "" {
 		return nil, fmt.Errorf("the code passed is incorrect or expired")
 	}
-	return &token, nil
+	return token, nil
 }
 
-func getAuthUser(token *model.Token) (map[string]interface{}, error) {
+func getAuthUser(token *v1.Token) (map[string]interface{}, error) {
 	var userInfoUrl = "https://api.github.com/user"
 	var req *http.Request
 	var err error

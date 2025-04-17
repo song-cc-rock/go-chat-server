@@ -18,7 +18,7 @@ func main() {
 	go hub.Run()
 
 	// start http server or ws server
-	r := router.Init(handler.NewRegisterHandler(), handler.NewAuthHandler(), handler.NewChatHandler(), hub)
+	r := router.Init(handler.NewRegisterHandler(), handler.NewAuthHandler(), handler.NewChatHandler(), handler.NewConversationHandler(), hub)
 	addr := config.GetString("server.host") + ":" + config.GetString("server.port")
 	_ = r.Run(addr)
 

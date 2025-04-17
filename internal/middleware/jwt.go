@@ -17,13 +17,14 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
-		_, err := jwt.ParseToken(tokenStr)
+		userId, err := jwt.ParseToken(tokenStr)
 
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid token"})
 			return
 		}
 
+		ctx.Set("userId", userId)
 		ctx.Next()
 	}
 }

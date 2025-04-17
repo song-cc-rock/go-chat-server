@@ -9,7 +9,7 @@ import (
 )
 
 func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler,
-	chatHandler *handler.ChatHandler,
+	chatHandler *handler.ChatHandler, conversationHandler *handler.ConversationHandler,
 	hub *ws.Hub) *gin.Engine {
 	log.Println("Initializing router...")
 	gin.SetMode(gin.ReleaseMode)
@@ -25,8 +25,9 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 	v1 := r.Group("/v1", middleware.JWTAuthMiddleware())
 	{
 		// User registration and login routes
-		v1.POST("/test-token", registerHandler.TestToken)
+		v1.GET("/user-profile", authHandler.GetAuthUserProfile)
 		v1.GET("/unread-count", chatHandler.GetUnReadCount)
+		v1.GET("/list/conversation", conversationHandler.GetConversationList)
 	}
 
 	// Chat socket routes

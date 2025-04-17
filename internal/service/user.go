@@ -2,17 +2,24 @@ package service
 
 import (
 	"context"
+	"github.com/patrickmn/go-cache"
 	v1 "go-chat-server/api/v1"
 	"go-chat-server/internal/model"
 	"go-chat-server/internal/repo"
 	"go-chat-server/pkg/jwt"
 	"go-chat-server/pkg/utils"
+	"time"
+)
+
+var (
+	tokenCache = cache.New(2*time.Hour, 5*time.Minute)
 )
 
 type UserService interface {
 	IsNewUser(ctx context.Context, mail string) bool
 	RegisterNewUser(ctx context.Context, request *v1.RegisterByCodeRequest) (model.User, error)
 	VerifyPwdWithToken(ctx context.Context, request *v1.LoginByPwdRequest) string
+	GetAuthUserProfile(ctx context.Context, userId string) *v1.AuthUserResponse
 }
 
 type userService struct {
@@ -52,4 +59,18 @@ func (u *userService) VerifyPwdWithToken(ctx context.Context, request *v1.LoginB
 		return token
 	}
 	return ""
+}
+
+func (u *userService) GetAuthUserProfile(ctx context.Context, userId string) *v1.AuthUserResponse {
+	user, err := u.userRepo.GetById(ctx, userId)
+	if err != nil {
+		return nil
+	}
+	return &v1.AuthUserResponse{
+		ID:       user.ID,
+		NickName: user.NickName,
+		Avatar:   user.Avatar,
+		Mail:     user.Mail,
+		Phone:    user.Phone,
+	}
 }

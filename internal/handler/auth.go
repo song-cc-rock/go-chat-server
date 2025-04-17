@@ -9,11 +9,13 @@ import (
 
 type AuthHandler struct {
 	githubService service.GithubService
+	userService   service.UserService
 }
 
 func NewAuthHandler() *AuthHandler {
 	return &AuthHandler{
 		githubService: service.NewGithubService(),
+		userService:   service.NewUserService(),
 	}
 }
 
@@ -41,4 +43,18 @@ func (r *AuthHandler) AuthGithubAndGetToken(ctx *gin.Context) {
 
 	redirectURL := "http://localhost:8888/auth-success?token=" + token
 	ctx.Redirect(http.StatusTemporaryRedirect, redirectURL)
+}
+
+func (r *AuthHandler) GetAuthUserProfile(ctx *gin.Context) {
+	userId, _ := ctx.Get("userId")
+	if userId == "" {
+		v1.HandleError(ctx, http.StatusUnauthorized, "未登录")
+		return
+	}
+	user := r.userService.GetAuthUserProfile(ctx, userId.(string))
+	if user == nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, "获取登录用户信息失败")
+		return
+	}
+	v1.HandleSuccess(ctx, user)
 }
