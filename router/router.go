@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-chat-server/internal/handler"
 	"go-chat-server/internal/middleware"
@@ -9,10 +8,9 @@ import (
 	"log"
 )
 
-func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler, hub *ws.Hub) *gin.Engine {
-	if hub == nil {
-		fmt.Sprintf("dsadadada")
-	}
+func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler,
+	chatHandler *handler.ChatHandler,
+	hub *ws.Hub) *gin.Engine {
 	log.Println("Initializing router...")
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
@@ -28,6 +26,7 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 	{
 		// User registration and login routes
 		v1.POST("/test-token", registerHandler.TestToken)
+		v1.GET("/unread-count", chatHandler.GetUnReadCount)
 	}
 
 	// Chat socket routes

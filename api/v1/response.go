@@ -17,5 +17,4 @@ func HandleError(ctx *gin.Context, code int, msg string) {
 		"code": code,
 		"msg":  msg,
 	})
-
 }

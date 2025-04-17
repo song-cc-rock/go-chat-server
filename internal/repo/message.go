@@ -11,6 +11,7 @@ import (
 type MessageRepository interface {
 	SaveMsgToDB(message *v1.ChatMessage) (*model.Message, error)
 	UpdateMsgStatus(msgIds []string, newStatus string) error
+	GetUnReadCount(userId string) (map[string]int64, error)
 }
 
 type messageRepository struct {
