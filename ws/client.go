@@ -3,7 +3,8 @@ package ws
 import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
-	"go-chat-server/internal/model"
+	v1 "go-chat-server/api/v1"
+	"go-chat-server/internal/repo"
 )
 
 type Client struct {
@@ -28,16 +29,21 @@ func (c *Client) ReadPump() {
 			break
 		}
 
-		var msg model.Message
+		var msg v1.ChatMessage
 		if err := json.Unmarshal(msgBytes, &msg); err != nil {
 			continue
 		}
 
-		// TODO: 消息入库
+		msgRepo := repo.NewMessageRepository()
+		dbMsg, err := msgRepo.SaveMsgToDB(&msg)
+		if err != nil {
+			continue
+		}
 
 		//c.Hub.Broadcast <- msgBytes
 		if targetClient, ok := c.Hub.Clients[msg.To]; ok {
 			targetClient.Send <- msgBytes
+			_ = msgRepo.UpdateMsgStatus([]string{dbMsg.ID}, "read")
 		} else {
 			// TODO: 目标用户不在线，消息入库
 		}
