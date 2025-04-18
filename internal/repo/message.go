@@ -11,7 +11,7 @@ import (
 type MessageRepository interface {
 	SaveMsgToDB(message *v1.ChatMessage) (*model.Message, error)
 	UpdateMsgStatus(msgIds []string, newStatus string) error
-	GetUnReadCount(userId string) (map[string]int64, error)
+	GetUnReadCount(userId string) (int64, error)
 }
 
 type messageRepository struct {
@@ -47,19 +47,12 @@ func (m *messageRepository) UpdateMsgStatus(msgIds []string, newStatus string) e
 	return nil
 }
 
-// GetUnReadCount 按发送人维度统计获取未读消息数量
-func (m *messageRepository) GetUnReadCount(userId string) (map[string]int64, error) {
-	var count []struct {
-		FromId string
-		Count  int64
-	}
-	if err := m.db.Model(&model.Message{}).Select("from_id, count(*) as count").Where("to_id = ? and status = ?", userId, "sent").Group("from_id").Find(&count).Error; err != nil {
-		return nil, err
+// GetUnReadCount 获取未读消息数量
+func (m *messageRepository) GetUnReadCount(userId string) (int64, error) {
+	var count int64
+	if err := m.db.Model(&model.Message{}).Select("count(*) as count").Where("to_id = ? and status = ?", userId, "sent").Find(&count).Error; err != nil {
+		return 0, err
 	}
 
-	result := make(map[string]int64)
-	for _, c := range count {
-		result[c.FromId] = c.Count
-	}
-	return result, nil
+	return count, nil
 }

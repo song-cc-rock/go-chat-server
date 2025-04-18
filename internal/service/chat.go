@@ -3,7 +3,7 @@ package service
 import "go-chat-server/internal/repo"
 
 type ChatService interface {
-	GetUnReadCount(userId string) (map[string]int64, error)
+	GetUnReadCount(userId string) (int64, error)
 }
 
 type chatService struct {
@@ -16,6 +16,6 @@ func NewChatService() ChatService {
 	}
 }
 
-func (c *chatService) GetUnReadCount(userId string) (map[string]int64, error) {
+func (c *chatService) GetUnReadCount(userId string) (int64, error) {
 	return c.messageRepo.GetUnReadCount(userId)
 }
