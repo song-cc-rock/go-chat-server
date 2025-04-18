@@ -7,7 +7,7 @@ type User struct {
 	Phone    string `gorm:"type:varchar(50);"`                    // 电话
 	Mail     string `gorm:"type:varchar(50);"`                    // 邮箱
 	Password string `gorm:"type:varchar(255);not null"`           // 密码
-	Avatar   string `gorm:"type:varchar(100);"`                   // 头像
+	Avatar   string `gorm:"type:varchar(1000);"`                  // 头像
 	GithubId int64  `gorm:"type:int(11);"`                        // Github ID
 }
 

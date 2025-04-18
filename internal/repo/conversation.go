@@ -27,7 +27,8 @@ func NewConversationRepository() ConversationRepository {
 func (c *conversationRepository) GetConversationList(userId string) ([]v1.ConversationResponse, error) {
 	var conversations []v1.ConversationResponse
 	err := c.db.Table("conversation").
-		Select("conversation.id, conversation.user_id, conversation.target_user_id, conversation.last_message, conversation.unread_count, conversation.last_message_at, user.nick_name, user.avatar").
+		Select("conversation.id, conversation.user_id, conversation.target_user_id, conversation.last_message, conversation.unread_count, conversation.last_message_at,"+
+			"conversation.last_sent_user, user.nick_name, user.avatar").
 		Joins("JOIN user ON user.id = conversation.target_user_id").
 		Where("conversation.user_id = ?", userId).
 		Find(&conversations).Error

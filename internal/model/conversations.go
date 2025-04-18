@@ -6,6 +6,7 @@ type Conversation struct {
 	TargetUserID  string `gorm:"type:varchar(50);not null;"`           // 会话对象
 	LastMessage   string `gorm:"type:text;not null;"`                  // 最后一条消息
 	LastMessageAt int64  `gorm:"type:bigint;not null;"`                // 最后一条消息时间
+	LastSentUser  string `gorm:"type:varchar(50);not null;"`           // 最后发送用户
 	UnreadCount   int64  `gorm:"type:bigint;not null;"`                // 未读消息数量
 	Deleted       bool   `gorm:"type:bool;default:false"`              // 是否删除
 }
