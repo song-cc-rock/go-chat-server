@@ -30,3 +30,17 @@ func (c *ConversationHandler) GetConversationList(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, list)
 }
+
+func (c *ConversationHandler) GetConversationMsgHis(ctx *gin.Context) {
+	conversationId, _ := ctx.GetQuery("id")
+	if conversationId == "" {
+		v1.HandleError(ctx, http.StatusBadRequest, "参数异常")
+		return
+	}
+	list, err := c.conversationService.GetConversationMsgHis(conversationId)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, "获取会话消息历史错误")
+		return
+	}
+	v1.HandleSuccess(ctx, list)
+}

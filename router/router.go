@@ -28,6 +28,7 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 		v1.GET("/user-profile", authHandler.GetAuthUserProfile)
 		v1.GET("/unread-count", chatHandler.GetUnReadCount)
 		v1.GET("/conversations", conversationHandler.GetConversationList)
+		v1.GET("/conversation/his", conversationHandler.GetConversationMsgHis)
 	}
 
 	// Chat socket routes

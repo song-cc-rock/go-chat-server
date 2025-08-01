@@ -45,10 +45,12 @@ func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([
 		return nil, fmt.Errorf("failed to get conversation msg: %v", err)
 	}
 	var messages []v1.ChatMessage
-	err := c.db.Model(&model.Message{}).
-		Select("id, from_id, to_id, content, created_at").
+	err := c.db.Table("message").
+		Select("message.id, u1.nick_name as send, u2.nick_name as send, content, created_at, u1.avatar as avatar").
+		Joins("join user u1 on u1.id = message.from_id").
+		Joins("join user u2 on u2.id = message.to_id").
 		Where(
-			"(from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)",
+			"(message.from_id = ? and message.to_id = ?) or (message.from_id = ? and message.to_id = ?)",
 			conversation.UserID, conversation.TargetUserID,
 			conversation.TargetUserID, conversation.UserID,
 		).

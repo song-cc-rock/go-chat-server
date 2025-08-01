@@ -11,5 +11,5 @@ type Message struct {
 }
 
 func (u *Message) TableName() string {
-	return "messages"
+	return "message"
 }

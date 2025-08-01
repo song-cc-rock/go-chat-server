@@ -5,7 +5,9 @@ import (
 	"go-chat-server/pkg/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
+	"os"
 	"time"
 )
 
@@ -14,7 +16,19 @@ var DB *gorm.DB
 // InitDB init db
 func InitDB() {
 	var err error
-	DB, err = gorm.Open(mysql.Open(config.GetString("db.mysql.dsn")), &gorm.Config{})
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n[GORM SQL] ", log.LstdFlags), // 自定义日志格式
+		logger.Config{
+			SlowThreshold:             time.Second, // 慢 SQL 阈值
+			LogLevel:                  logger.Info, // 日志级别：Silent, Error, Warn, Info
+			IgnoreRecordNotFoundError: true,        // 忽略 ErrRecordNotFound 错误
+			Colorful:                  true,        // 是否带颜色
+		},
+	)
+
+	DB, err = gorm.Open(mysql.Open(config.GetString("db.mysql.dsn")), &gorm.Config{
+		Logger: newLogger,
+	})
 
 	if err != nil {
 		panic("Failed to connect chat db")

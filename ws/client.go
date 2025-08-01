@@ -3,8 +3,10 @@ package ws
 import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
+	"github.com/mitchellh/mapstructure"
 	v1 "go-chat-server/api/v1"
 	"go-chat-server/internal/repo"
+	"go-chat-server/pkg/jwt"
 )
 
 type Client struct {
@@ -29,23 +31,51 @@ func (c *Client) ReadPump() {
 			break
 		}
 
-		var msg v1.ChatMessage
+		var msg map[string]interface{}
 		if err := json.Unmarshal(msgBytes, &msg); err != nil {
 			continue
 		}
 
+		if msg["type"] == "auth" {
+			token := msg["token"].(string)
+			userId, err := jwt.ParseToken(token)
+			if err != nil || userId == "" {
+				err := c.Conn.WriteMessage(websocket.TextMessage, []byte("auth failed"))
+				if err != nil {
+					return
+				}
+				c.Conn.Close()
+				return
+			}
+			c.UserID = userId
+			// auth success
+			continue
+		}
+
+		// no auth
+		if c.UserID == "" {
+			err := c.Conn.WriteMessage(websocket.TextMessage, []byte("auth failed, cannot send message"))
+			if err != nil {
+				return
+			}
+			continue
+		}
+
+		// decode message
+		var sendMsg v1.SendMsg
+		mapstructure.Decode(msg, &sendMsg)
 		msgRepo := repo.NewMessageRepository()
-		dbMsg, err := msgRepo.SaveMsgToDB(&msg)
+		_, err = msgRepo.SaveMsgToDB(&sendMsg)
 		if err != nil {
 			continue
 		}
 
 		//c.Hub.Broadcast <- msgBytes
-		if targetClient, ok := c.Hub.Clients[msg.To]; ok {
+		if targetClient, ok := c.Hub.Clients[sendMsg.Receiver]; ok {
 			targetClient.Send <- msgBytes
-			_ = msgRepo.UpdateMsgStatus([]string{dbMsg.ID}, "read")
+			// TODO: 不应该在这里更新消息状态, 需要用户在客户端对话框确认
 		} else {
-			// TODO: 目标用户不在线，消息入库
+			// TODO: 目标用户不在线，入MQ
 		}
 	}
 }

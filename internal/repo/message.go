@@ -9,7 +9,7 @@ import (
 )
 
 type MessageRepository interface {
-	SaveMsgToDB(message *v1.ChatMessage) (*model.Message, error)
+	SaveMsgToDB(message *v1.SendMsg) (*model.Message, error)
 	UpdateMsgStatus(msgIds []string, newStatus string) error
 	GetUnReadCount(userId string) (int64, error)
 }
@@ -23,11 +23,12 @@ func NewMessageRepository() MessageRepository {
 }
 
 // SaveMsgToDB 消息入库
-func (m *messageRepository) SaveMsgToDB(message *v1.ChatMessage) (*model.Message, error) {
+func (m *messageRepository) SaveMsgToDB(message *v1.SendMsg) (*model.Message, error) {
+	// 插入消息
 	msg := &model.Message{
 		ID:        uuid.NewString(),
-		FromId:    message.From,
-		ToId:      message.To,
+		FromId:    message.Send,
+		ToId:      message.Receiver,
 		Content:   message.Content,
 		MsgType:   "text",
 		Status:    "sent",
@@ -36,6 +37,7 @@ func (m *messageRepository) SaveMsgToDB(message *v1.ChatMessage) (*model.Message
 	if err := m.db.Create(msg).Error; err != nil {
 		return nil, err
 	}
+	// 更新对话字段
 	return msg, nil
 }
 
