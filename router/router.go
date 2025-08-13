@@ -34,5 +34,11 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 	// Chat socket routes
 	r.GET("/ws", ws.ServerWs(hub))
 
+	// Static
+	r.Static("/static", "./static")
+	r.NoRoute(func(c *gin.Context) {
+		c.File("./static/index.html")
+	})
+
 	return r
 }
