@@ -26,11 +26,6 @@ func ServerWs(hub *Hub) gin.HandlerFunc {
 			Hub:  hub,
 		}
 
-		// add client to hub
-		hub.Register <- client
-
-		// TODO: 新上线的用户, 需要将MQ中消息推送
-
 		// start read and write pumps
 		go client.ReadPump()
 		go client.WritePump()

@@ -46,7 +46,7 @@ func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([
 	}
 	var messages []v1.ChatMessage
 	err := c.db.Table("message").
-		Select("message.id, u1.nick_name as send, u2.nick_name as send, content, created_at, u1.avatar as avatar").
+		Select("message.id, u1.id as send, u2.id as receiver, content, created_at, u1.avatar as avatar").
 		Joins("join user u1 on u1.id = message.from_id").
 		Joins("join user u2 on u2.id = message.to_id").
 		Where(

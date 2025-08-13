@@ -48,7 +48,8 @@ func (c *Client) ReadPump() {
 				return
 			}
 			c.UserID = userId
-			// auth success
+			c.Hub.Register <- c
+			// auth success and register to hub
 			continue
 		}
 
