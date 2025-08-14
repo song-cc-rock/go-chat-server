@@ -11,6 +11,7 @@ import (
 type ConversationRepository interface {
 	GetConversationList(userId string) ([]v1.ConversationResponse, error)
 	GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error)
+	UpdateConversationLastInfo(message *v1.SendMsg)
 }
 
 type conversationRepository struct {
@@ -46,7 +47,7 @@ func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([
 	}
 	var messages []v1.ChatMessage
 	err := c.db.Table("message").
-		Select("message.id, u1.id as send, u2.id as receiver, content, created_at, u1.avatar as avatar").
+		Select("message.id, u1.id as send, u2.id as receiver, content, created_at, u1.avatar as avatar, message.status").
 		Joins("join user u1 on u1.id = message.from_id").
 		Joins("join user u2 on u2.id = message.to_id").
 		Where(
@@ -60,4 +61,20 @@ func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([
 		return nil, err
 	}
 	return messages, nil
+}
+
+func (c *conversationRepository) UpdateConversationLastInfo(msg *v1.SendMsg) {
+	// 更新发送人和接收人的会话信息
+	c.db.Table("conversation").
+		Update("last_message_at", msg.CreatedAt).
+		Update("last_message", msg.Content).
+		Update("last_sent_user", msg.Send).
+		Update("unread_count", 0).
+		Where("user_id = ? and target_user_id = ?", msg.Send, msg.Receiver)
+	c.db.Table("conversation").
+		Update("last_message_at", msg.CreatedAt).
+		Update("last_message", msg.Content).
+		Update("last_sent_user", msg.Send).
+		Update("unread_count", gorm.Expr("unread_count + 1")).
+		Where("user_id = ? and target_user_id = ?", msg.Receiver, msg.Send)
 }

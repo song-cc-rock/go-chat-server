@@ -7,6 +7,7 @@ import (
 	v1 "go-chat-server/api/v1"
 	"go-chat-server/internal/repo"
 	"go-chat-server/pkg/jwt"
+	"time"
 )
 
 type Client struct {
@@ -65,19 +66,43 @@ func (c *Client) ReadPump() {
 		// decode message
 		var sendMsg v1.SendMsg
 		mapstructure.Decode(msg, &sendMsg)
+		ackMsg := map[string]interface{}{
+			"clientTmpId": sendMsg.ID,
+			"type":        "ack",
+			"timestamp":   time.Now().UnixMilli(),
+		}
 		msgRepo := repo.NewMessageRepository()
-		_, err = msgRepo.SaveMsgToDB(&sendMsg)
+		dbMsgId := ""
+		dbMsgId, err = msgRepo.SaveMsgToDB(&sendMsg)
 		if err != nil {
+			ackMsg["status"] = "failed"
 			continue
 		}
 
+		ackMsg["status"] = "success"
+		ackMsg["actualId"] = dbMsgId
+		// update message status in db
+		_ = msgRepo.UpdateMsgStatus([]string{dbMsgId}, "success")
+		conversationRepo := repo.NewConversationRepository()
+		conversationRepo.UpdateConversationLastInfo(&sendMsg)
+
 		//c.Hub.Broadcast <- msgBytes
 		if targetClient, ok := c.Hub.Clients[sendMsg.Receiver]; ok {
-			targetClient.Send <- msgBytes
-			// TODO: 不应该在这里更新消息状态, 需要用户在客户端对话框确认
+			var msg map[string]interface{}
+			if err := json.Unmarshal(msgBytes, &msg); err != nil {
+				continue
+			}
+			msg["id"] = dbMsgId
+			msg["status"] = "success"
+			sendBytes, _ := json.Marshal(msg)
+			targetClient.Send <- sendBytes
 		} else {
-			// TODO: 目标用户不在线，入MQ
+			// TODO: target user not online, send to hub
 		}
+
+		// send ack message to sender
+		ackBytes, _ := json.Marshal(ackMsg)
+		c.Send <- ackBytes
 	}
 }
 
