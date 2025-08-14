@@ -3,7 +3,6 @@ package ws
 import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
-	"github.com/mitchellh/mapstructure"
 	v1 "go-chat-server/api/v1"
 	"go-chat-server/internal/repo"
 	"go-chat-server/pkg/jwt"
@@ -65,7 +64,7 @@ func (c *Client) ReadPump() {
 
 		// decode message
 		var sendMsg v1.SendMsg
-		mapstructure.Decode(msg, &sendMsg)
+		json.Unmarshal(msgBytes, &sendMsg)
 		ackMsg := map[string]interface{}{
 			"clientTmpId": sendMsg.ID,
 			"type":        "ack",

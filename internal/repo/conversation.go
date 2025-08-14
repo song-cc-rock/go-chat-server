@@ -12,6 +12,7 @@ type ConversationRepository interface {
 	GetConversationList(userId string) ([]v1.ConversationResponse, error)
 	GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error)
 	UpdateConversationLastInfo(message *v1.SendMsg)
+	ClearConversationUnreadCount(conversationId string) error
 }
 
 type conversationRepository struct {
@@ -45,6 +46,13 @@ func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([
 	if err := c.db.Where("id = ?", conversationId).First(conversation).Error; err != nil {
 		return nil, fmt.Errorf("failed to get conversation msg: %v", err)
 	}
+
+	// 更新对话未读消息数 = 0
+	c.db.Table("conversation").
+		Where("id = ?", conversationId).
+		Update("unread_count", 0)
+
+	// 获取会话的消息
 	var messages []v1.ChatMessage
 	err := c.db.Table("message").
 		Select("message.id, u1.id as send, u2.id as receiver, content, created_at, u1.avatar as avatar, message.status").
@@ -66,15 +74,27 @@ func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([
 func (c *conversationRepository) UpdateConversationLastInfo(msg *v1.SendMsg) {
 	// 更新发送人和接收人的会话信息
 	c.db.Table("conversation").
-		Update("last_message_at", msg.CreatedAt).
-		Update("last_message", msg.Content).
-		Update("last_sent_user", msg.Send).
-		Update("unread_count", 0).
-		Where("user_id = ? and target_user_id = ?", msg.Send, msg.Receiver)
+		Where("user_id = ? AND target_user_id = ?", msg.Send, msg.Receiver).
+		Updates(map[string]interface{}{
+			"last_message_at": msg.CreatedAt / 1000,
+			"last_message":    msg.Content,
+			"last_sent_user":  msg.Send,
+			"unread_count":    0,
+		})
+
 	c.db.Table("conversation").
-		Update("last_message_at", msg.CreatedAt).
-		Update("last_message", msg.Content).
-		Update("last_sent_user", msg.Send).
-		Update("unread_count", gorm.Expr("unread_count + 1")).
-		Where("user_id = ? and target_user_id = ?", msg.Receiver, msg.Send)
+		Where("user_id = ? AND target_user_id = ?", msg.Receiver, msg.Send).
+		Updates(map[string]interface{}{
+			"last_message_at": msg.CreatedAt / 1000,
+			"last_message":    msg.Content,
+			"last_sent_user":  msg.Send,
+			"unread_count":    gorm.Expr("unread_count + 1"),
+		})
+
+}
+
+func (c *conversationRepository) ClearConversationUnreadCount(conversationId string) error {
+	return c.db.Table("conversation").
+		Where("id = ?", conversationId).
+		Update("unread_count", 0).Error
 }

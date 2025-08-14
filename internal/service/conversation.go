@@ -8,6 +8,7 @@ import (
 type ConversationService interface {
 	GetConversationList(userId string) ([]v1.ConversationResponse, error)
 	GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error)
+	ClearConversationUnreadCount(conversationId string) error
 }
 
 type conversationService struct {
@@ -26,4 +27,8 @@ func (c *conversationService) GetConversationList(userId string) ([]v1.Conversat
 
 func (c *conversationService) GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error) {
 	return c.conversationRepo.GetConversationMsgHis(conversationId)
+}
+
+func (c *conversationService) ClearConversationUnreadCount(conversationId string) error {
+	return c.conversationRepo.ClearConversationUnreadCount(conversationId)
 }

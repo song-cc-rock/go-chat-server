@@ -32,7 +32,7 @@ func (m *messageRepository) SaveMsgToDB(message *v1.SendMsg) (string, error) {
 		Content:   message.Content,
 		MsgType:   "text",
 		Status:    "sent",
-		CreatedAt: message.CreatedAt,
+		CreatedAt: message.CreatedAt / 1000,
 	}
 	if err := m.db.Create(msg).Error; err != nil {
 		return "", err

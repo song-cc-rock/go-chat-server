@@ -44,3 +44,17 @@ func (c *ConversationHandler) GetConversationMsgHis(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, list)
 }
+
+func (c *ConversationHandler) ClearConversationUnreadCount(ctx *gin.Context) {
+	conversationId, _ := ctx.GetQuery("id")
+	if conversationId == "" {
+		v1.HandleError(ctx, http.StatusBadRequest, "参数异常")
+		return
+	}
+	err := c.conversationService.ClearConversationUnreadCount(conversationId)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, "清除会话未读消息错误")
+		return
+	}
+	v1.HandleSuccess(ctx, 0)
+}
