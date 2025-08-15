@@ -52,7 +52,7 @@ func (m *messageRepository) UpdateMsgStatus(msgIds []string, newStatus string) e
 // GetUnReadCount 获取未读消息数量
 func (m *messageRepository) GetUnReadCount(userId string) (int64, error) {
 	var count int64
-	if err := m.db.Model(&model.Message{}).Select("count(*) as count").Where("to_id = ? and status = ?", userId, "sent").Find(&count).Error; err != nil {
+	if err := m.db.Model(&model.Conversation{}).Select("sum(unread_count) as count").Where("user_id = ?", userId).Find(&count).Error; err != nil {
 		return 0, err
 	}
 
