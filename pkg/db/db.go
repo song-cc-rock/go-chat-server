@@ -20,7 +20,7 @@ func InitDB() {
 		log.New(os.Stdout, "\r\n[GORM SQL] ", log.LstdFlags), // 自定义日志格式
 		logger.Config{
 			SlowThreshold:             time.Second, // 慢 SQL 阈值
-			LogLevel:                  logger.Info, // 日志级别：Silent, Error, Warn, Info
+			LogLevel:                  logger.Warn, // 日志级别：Silent, Error, Warn, Info
 			IgnoreRecordNotFoundError: true,        // 忽略 ErrRecordNotFound 错误
 			Colorful:                  true,        // 是否带颜色
 		},
@@ -31,7 +31,7 @@ func InitDB() {
 	})
 
 	if err != nil {
-		panic("Failed to connect chat db")
+		panic("❌ Failed to connect chat db")
 	}
 
 	db, _ := DB.DB()
@@ -40,14 +40,14 @@ func InitDB() {
 	db.SetConnMaxLifetime(30 * time.Minute)
 	db.SetConnMaxIdleTime(30 * time.Minute)
 
-	log.Println("Connect to chat db success")
+	log.Println("✅ Connect to chat db success")
 
 	// init table
 	InitTable(DB)
 }
 
 func InitTable(db *gorm.DB) {
-	log.Println("Auto migrate tables")
+	log.Println("✅ Auto migrate tables")
 	err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.User{}, &model.Message{}, &model.Conversation{})
 	if err != nil {
 		return

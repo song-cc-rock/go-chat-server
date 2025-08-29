@@ -23,3 +23,8 @@ oauth:
     app_id: "wx4f30218dee2d16fd"
     app_secret: "c073919f5ddeea6b64376548836e2a75"
     redirect_uri: "http://localhost:8080/oauth/wechat"
+minio:
+  endpoint: "127.0.0.1:9000"
+  access_key: "minioadmin"
+  secret_key: "minioadmin"
+  ssl: false

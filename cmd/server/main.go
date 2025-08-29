@@ -2,16 +2,20 @@ package main
 
 import (
 	"go-chat-server/internal/handler"
+	"go-chat-server/pkg/bootstrap"
 	"go-chat-server/pkg/config"
-	"go-chat-server/pkg/db"
 	"go-chat-server/router"
 	"go-chat-server/ws"
 	"log"
+	"os"
 )
 
 func main() {
+	log.SetOutput(os.Stdout)
 	// init db
-	db.InitDB()
+	if err := bootstrap.Init(); err != nil {
+		log.Fatal("❌ Init error:", err.Error())
+	}
 
 	// init chat hub
 	hub := ws.NewHub()
@@ -20,7 +24,6 @@ func main() {
 	// start http server or ws server
 	r := router.Init(handler.NewRegisterHandler(), handler.NewAuthHandler(), handler.NewChatHandler(), handler.NewConversationHandler(), hub)
 	addr := config.GetString("server.host") + ":" + config.GetString("server.port")
+	log.Println("🚀 Server started at " + addr)
 	_ = r.Run(addr)
-
-	log.Println("Server started at " + addr)
 }

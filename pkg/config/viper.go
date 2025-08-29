@@ -8,7 +8,7 @@ import (
 
 var AppViper = viper.New()
 
-func init() {
+func Init() {
 	viperPath, err := os.Getwd()
 	if err != nil {
 		panic("Cannot get project path")
@@ -18,9 +18,9 @@ func init() {
 	AppViper.SetConfigType("yaml")
 
 	if err := AppViper.ReadInConfig(); err != nil {
-		log.Fatalf("Error reading config file, %s", err)
+		log.Fatalf("❌ Error reading config file, %s", err)
 	} else {
-		log.Printf("Using config file: %s", AppViper.ConfigFileUsed())
+		log.Printf("🛠️ Using config file: %s", AppViper.ConfigFileUsed())
 	}
 }
 
@@ -30,4 +30,8 @@ func GetString(key string) string {
 
 func GetInt(key string) int {
 	return AppViper.GetInt(key)
+}
+
+func GetBool(key string) bool {
+	return AppViper.GetBool(key)
 }

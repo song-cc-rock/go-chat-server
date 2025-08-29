@@ -11,7 +11,7 @@ import (
 func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler,
 	chatHandler *handler.ChatHandler, conversationHandler *handler.ConversationHandler,
 	hub *ws.Hub) *gin.Engine {
-	log.Println("Initializing router...")
+	log.Println("🚀 Initializing router...")
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
