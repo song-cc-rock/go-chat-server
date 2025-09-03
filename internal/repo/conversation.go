@@ -10,7 +10,7 @@ import (
 
 type ConversationRepository interface {
 	GetConversationList(userId string) ([]v1.ConversationResponse, error)
-	GetConversationMsgHis(request *v1.ConversationHisRequest) ([]v1.ChatMessage, error)
+	GetConversationMsgHis(request *v1.ConversationHisRequest) ([]*v1.ChatMessage, error)
 	UpdateConversationLastInfo(message *v1.SendMsg)
 	ClearConversationUnreadCount(conversationId string) error
 }
@@ -41,7 +41,7 @@ func (c *conversationRepository) GetConversationList(userId string) ([]v1.Conver
 }
 
 // GetConversationMsgHis 获取会话历史消息
-func (c *conversationRepository) GetConversationMsgHis(request *v1.ConversationHisRequest) ([]v1.ChatMessage, error) {
+func (c *conversationRepository) GetConversationMsgHis(request *v1.ConversationHisRequest) ([]*v1.ChatMessage, error) {
 	conversation := &model.Conversation{}
 	if err := c.db.Where("id = ?", request.ConversationID).First(conversation).Error; err != nil {
 		return nil, fmt.Errorf("failed to get conversation msg: %v", err)
@@ -53,9 +53,10 @@ func (c *conversationRepository) GetConversationMsgHis(request *v1.ConversationH
 		Update("unread_count", 0)
 
 	// 获取会话的消息
-	var messages []v1.ChatMessage
+	var messages []*v1.ChatMessage
 	err := c.db.Table("message").
-		Select("message.id, u1.id as send, u2.id as receiver, content, created_at, u1.avatar as avatar, message.status, message.msg_type as type").
+		Select("message.id, u1.id as send, u2.id as receiver, content, "+
+			"created_at, u1.avatar as avatar, message.status, message.msg_type as type, message.file_id").
 		Joins("join user u1 on u1.id = message.from_id").
 		Joins("join user u2 on u2.id = message.to_id").
 		Where(
@@ -69,6 +70,16 @@ func (c *conversationRepository) GetConversationMsgHis(request *v1.ConversationH
 		Find(&messages).Error
 	if err != nil {
 		return nil, err
+	}
+
+	// 过滤文件消息, 设置文件信息
+	for _, msg := range messages {
+		if msg.Type == "file" && msg.FileId != "" {
+			file := &model.File{}
+			if err := c.db.Where("id = ?", msg.FileId).First(file).Error; err == nil {
+				msg.FileInfo = file
+			}
+		}
 	}
 	return messages, nil
 }
