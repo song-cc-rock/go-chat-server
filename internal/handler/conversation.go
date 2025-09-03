@@ -32,12 +32,12 @@ func (c *ConversationHandler) GetConversationList(ctx *gin.Context) {
 }
 
 func (c *ConversationHandler) GetConversationMsgHis(ctx *gin.Context) {
-	conversationId, _ := ctx.GetQuery("id")
-	if conversationId == "" {
-		v1.HandleError(ctx, http.StatusBadRequest, "参数异常")
+	var req v1.ConversationHisRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, "参数异常: "+err.Error())
 		return
 	}
-	list, err := c.conversationService.GetConversationMsgHis(conversationId)
+	list, err := c.conversationService.GetConversationMsgHis(&req)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, "获取会话消息历史错误")
 		return

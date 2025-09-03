@@ -7,7 +7,9 @@ type ChatMessage struct {
 	Content   string `json:"content"`
 	CreatedAt int64  `json:"created_at"`
 	Avatar    string `json:"avatar"`
-	Status    string `json:"status"` // 状态: sent, success, failed, deleted
+	Status    string `json:"status"`
+	Type      string `json:"type"`
+	//FileInfo  *model.File `json:"fileInfo,omitempty"`
 }
 
 type SendMsg struct {
@@ -17,4 +19,5 @@ type SendMsg struct {
 	Receiver       string `json:"receiver"`
 	Content        string `json:"content"`
 	CreatedAt      int64  `json:"created_at"`
+	Type           string `json:"type"`
 }

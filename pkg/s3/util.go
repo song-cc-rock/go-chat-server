@@ -2,28 +2,19 @@ package s3
 
 import (
 	"context"
-	"io"
-	"time"
-
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
+	"io"
+	"path/filepath"
+	"strings"
+	"time"
 )
-
-// UploadFile 上传本地文件到 S3
-func UploadFile(ctx context.Context, bucketName, objectName, filePath, contentType string) (minio.UploadInfo, error) {
-	c := GetClient()
-	info, err := c.FPutObject(ctx, bucketName, objectName, filePath, minio.PutObjectOptions{
-		ContentType: contentType,
-	})
-	if err != nil {
-		return minio.UploadInfo{}, err
-	}
-	return info, nil
-}
 
 // UploadStream 上传流（适合 Web 上传的文件）
 func UploadStream(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, contentType string) (minio.UploadInfo, error) {
 	c := GetClient()
-	info, err := c.PutObject(ctx, bucketName, objectName, reader, objectSize, minio.PutObjectOptions{
+	info, err := c.PutObject(ctx, bucketName, GenerateObjectName(objectName), reader, objectSize, minio.PutObjectOptions{
 		ContentType: contentType,
 	})
 	if err != nil {
@@ -44,12 +35,18 @@ func DownloadStream(ctx context.Context, bucketName, objectName string) (io.Read
 	return c.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
 }
 
-// GetPresignedURL 生成临时访问链接
-func GetPresignedURL(ctx context.Context, bucketName, objectName string, expiry time.Duration) (string, error) {
-	c := GetClient()
-	url, err := c.PresignedGetObject(ctx, bucketName, objectName, expiry, nil)
-	if err != nil {
-		return "", err
+// GenerateObjectName 生成唯一的对象名称，包含日期路径和 UUID，防止命名冲突且后续可以按日期归档清理
+func GenerateObjectName(filename string) string {
+	now := time.Now()
+	datePath := now.Format("200601")
+	unique := uuid.New().String()[:8]
+	return fmt.Sprintf("%s/%s-%s", datePath, unique, filepath.Base(filename))
+}
+
+func GetFileExt(filename string) string {
+	parts := strings.Split(filename, ".")
+	if len(parts) > 1 {
+		return parts[len(parts)-1]
 	}
-	return url.String(), nil
+	return ""
 }

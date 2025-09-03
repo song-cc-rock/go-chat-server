@@ -7,7 +7,7 @@ import (
 
 type ConversationService interface {
 	GetConversationList(userId string) ([]v1.ConversationResponse, error)
-	GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error)
+	GetConversationMsgHis(request *v1.ConversationHisRequest) ([]v1.ChatMessage, error)
 	ClearConversationUnreadCount(conversationId string) error
 }
 
@@ -25,8 +25,8 @@ func (c *conversationService) GetConversationList(userId string) ([]v1.Conversat
 	return c.conversationRepo.GetConversationList(userId)
 }
 
-func (c *conversationService) GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error) {
-	return c.conversationRepo.GetConversationMsgHis(conversationId)
+func (c *conversationService) GetConversationMsgHis(request *v1.ConversationHisRequest) ([]v1.ChatMessage, error) {
+	return c.conversationRepo.GetConversationMsgHis(request)
 }
 
 func (c *conversationService) ClearConversationUnreadCount(conversationId string) error {

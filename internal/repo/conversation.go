@@ -10,7 +10,7 @@ import (
 
 type ConversationRepository interface {
 	GetConversationList(userId string) ([]v1.ConversationResponse, error)
-	GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error)
+	GetConversationMsgHis(request *v1.ConversationHisRequest) ([]v1.ChatMessage, error)
 	UpdateConversationLastInfo(message *v1.SendMsg)
 	ClearConversationUnreadCount(conversationId string) error
 }
@@ -41,21 +41,21 @@ func (c *conversationRepository) GetConversationList(userId string) ([]v1.Conver
 }
 
 // GetConversationMsgHis 获取会话历史消息
-func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([]v1.ChatMessage, error) {
+func (c *conversationRepository) GetConversationMsgHis(request *v1.ConversationHisRequest) ([]v1.ChatMessage, error) {
 	conversation := &model.Conversation{}
-	if err := c.db.Where("id = ?", conversationId).First(conversation).Error; err != nil {
+	if err := c.db.Where("id = ?", request.ConversationID).First(conversation).Error; err != nil {
 		return nil, fmt.Errorf("failed to get conversation msg: %v", err)
 	}
 
 	// 更新对话未读消息数 = 0
 	c.db.Table("conversation").
-		Where("id = ?", conversationId).
+		Where("id = ?", request.ConversationID).
 		Update("unread_count", 0)
 
 	// 获取会话的消息
 	var messages []v1.ChatMessage
 	err := c.db.Table("message").
-		Select("message.id, u1.id as send, u2.id as receiver, content, created_at, u1.avatar as avatar, message.status").
+		Select("message.id, u1.id as send, u2.id as receiver, content, created_at, u1.avatar as avatar, message.status, message.msg_type as type").
 		Joins("join user u1 on u1.id = message.from_id").
 		Joins("join user u2 on u2.id = message.to_id").
 		Where(
@@ -63,7 +63,9 @@ func (c *conversationRepository) GetConversationMsgHis(conversationId string) ([
 			conversation.UserID, conversation.TargetUserID,
 			conversation.TargetUserID, conversation.UserID,
 		).
-		Order("created_at asc").
+		Order("created_at desc").
+		Limit(request.Size).
+		Offset((request.Page - 1) * request.Size).
 		Find(&messages).Error
 	if err != nil {
 		return nil, err
