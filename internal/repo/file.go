@@ -9,6 +9,7 @@ import (
 
 type FileRepository interface {
 	SaveFileToDB(file *model.File) (string, error)
+	GetFileInfo(fileId string) (*model.File, error)
 }
 
 type fileRepository struct {
@@ -27,4 +28,12 @@ func (f *fileRepository) SaveFileToDB(file *model.File) (string, error) {
 	}
 	// 文件ID
 	return file.ID, nil
+}
+
+func (f *fileRepository) GetFileInfo(fileId string) (*model.File, error) {
+	file := &model.File{}
+	if err := f.db.Where("id = ?", fileId).First(file).Error; err != nil {
+		return nil, err
+	}
+	return file, nil
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler,
-	chatHandler *handler.ChatHandler, conversationHandler *handler.ConversationHandler, uploadHandler *handler.UploadHandler,
+	chatHandler *handler.ChatHandler, conversationHandler *handler.ConversationHandler, uploadHandler *handler.FileHandler,
 	hub *ws.Hub) *gin.Engine {
 	log.Println("🚀 Initializing router...")
 	gin.SetMode(gin.ReleaseMode)
@@ -31,6 +31,7 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 		v1.GET("/conversation/his", conversationHandler.GetConversationMsgHis)
 		v1.GET("/conversation/clear", conversationHandler.ClearConversationUnreadCount)
 		v1.POST("/upload", uploadHandler.Upload)
+		v1.GET("/download", uploadHandler.Download)
 	}
 
 	// Chat socket routes

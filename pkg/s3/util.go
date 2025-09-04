@@ -23,12 +23,6 @@ func UploadStream(ctx context.Context, bucketName, objectName string, reader io.
 	return info, nil
 }
 
-// DownloadFile 下载对象到本地文件
-func DownloadFile(ctx context.Context, bucketName, objectName, localPath string) error {
-	c := GetClient()
-	return c.FGetObject(ctx, bucketName, objectName, localPath, minio.GetObjectOptions{})
-}
-
 // DownloadStream 获取对象的流（适合直接返回给 HTTP 响应）
 func DownloadStream(ctx context.Context, bucketName, objectName string) (io.ReadCloser, error) {
 	c := GetClient()

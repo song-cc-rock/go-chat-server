@@ -5,20 +5,25 @@ import (
 	"go-chat-server/internal/repo"
 )
 
-type UploadService interface {
+type FileService interface {
 	SaveFileInfo(file *model.File) (string, error)
+	GetFileInfo(fileId string) (*model.File, error)
 }
 
-type uploadService struct {
+type fileService struct {
 	fileRepo repo.FileRepository
 }
 
-func NewUploadService() UploadService {
-	return &uploadService{
+func NewFileService() FileService {
+	return &fileService{
 		fileRepo: repo.NewFileRepository(),
 	}
 }
 
-func (u *uploadService) SaveFileInfo(file *model.File) (string, error) {
+func (u *fileService) SaveFileInfo(file *model.File) (string, error) {
 	return u.fileRepo.SaveFileToDB(file)
+}
+
+func (u *fileService) GetFileInfo(fileId string) (*model.File, error) {
+	return u.fileRepo.GetFileInfo(fileId)
 }
