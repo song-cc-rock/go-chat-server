@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"go-chat-server/internal/model"
@@ -16,6 +17,7 @@ type UserRepository interface {
 	CreateUserByMail(ctx context.Context, email string, firstPwd string) (*model.User, error)
 	GetByGithubId(githubId int64) (*model.User, error)
 	CreateGithubUser(githubUser map[string]interface{}) (*model.User, error)
+	GetUserByKeyword(ctx context.Context, keyword string) (*model.User, error)
 }
 
 type userRepository struct {
@@ -82,4 +84,20 @@ func (r *userRepository) CreateGithubUser(githubUser map[string]interface{}) (*m
 		return nil, fmt.Errorf("failed to create user by email: %v", err)
 	}
 	return user, nil
+}
+
+func (r *userRepository) GetUserByKeyword(ctx context.Context, keyword string) (*model.User, error) {
+	var user model.User
+	err := r.db.WithContext(ctx).
+		Select("id", "nick_name", "mail", "name", "avatar", "phone", "github_id"). // 👈 只查这几个列
+		Where("nick_name = ? OR mail = ?", keyword, keyword).
+		First(&user).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

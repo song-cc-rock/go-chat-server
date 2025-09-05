@@ -20,6 +20,7 @@ type UserService interface {
 	RegisterNewUser(ctx context.Context, request *v1.RegisterByCodeRequest) (model.User, error)
 	VerifyPwdWithToken(ctx context.Context, request *v1.LoginByPwdRequest) string
 	GetAuthUserProfile(ctx context.Context, userId string) *v1.AuthUserResponse
+	GetUserByKeyword(ctx context.Context, keyword string) (*model.User, error)
 }
 
 type userService struct {
@@ -73,4 +74,8 @@ func (u *userService) GetAuthUserProfile(ctx context.Context, userId string) *v1
 		Mail:     user.Mail,
 		Phone:    user.Phone,
 	}
+}
+
+func (u *userService) GetUserByKeyword(ctx context.Context, keyword string) (*model.User, error) {
+	return u.userRepo.GetUserByKeyword(ctx, keyword)
 }

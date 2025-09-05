@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler,
+func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHandler, userHandler *handler.UserHandler,
 	chatHandler *handler.ChatHandler, conversationHandler *handler.ConversationHandler, uploadHandler *handler.FileHandler,
 	hub *ws.Hub) *gin.Engine {
 	log.Println("🚀 Initializing router...")
@@ -26,6 +26,7 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 	{
 		// User registration and login routes
 		v1.GET("/user-profile", authHandler.GetAuthUserProfile)
+		v1.GET("/user-search", userHandler.SearchByKeyword)
 		v1.GET("/unread-count", chatHandler.GetUnReadCount)
 		v1.GET("/conversations", conversationHandler.GetConversationList)
 		v1.GET("/conversation/his", conversationHandler.GetConversationMsgHis)
