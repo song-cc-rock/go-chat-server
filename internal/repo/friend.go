@@ -2,12 +2,14 @@ package repo
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"go-chat-server/internal/model"
 	"go-chat-server/pkg/db"
 	"gorm.io/gorm"
 )
 
 type FriendRepository interface {
+	ApplyFriend(ctx context.Context, friendReq *model.FriendRequest) error
 }
 
 type friendRepository struct {
@@ -18,10 +20,11 @@ func NewFriendRepository() FriendRepository {
 	return &friendRepository{db.DB}
 }
 
-func (f *friendRepository) ApplyFriend(ctx context.Context, friend *model.Friend) error {
-	friend.Status = "pending"
-	friend.CreatedAt = friend.CreatedAt / 1000
-	return f.db.WithContext(ctx).Create(friend).Error
+func (f *friendRepository) ApplyFriend(ctx context.Context, friendReq *model.FriendRequest) error {
+	friendReq.ID = uuid.NewString()
+	friendReq.Status = "pending"
+	friendReq.CreatedAt = friendReq.CreatedAt / 1000
+	return f.db.WithContext(ctx).Model(&model.FriendRequest{}).Create(friendReq).Error
 }
 
 func (f *friendRepository) PassFriend(ctx context.Context, friendId string) error {

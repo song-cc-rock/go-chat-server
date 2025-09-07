@@ -63,6 +63,7 @@ func (m *messageRepository) GetUnReadCount(userId string) (int64, error) {
 	return count, nil
 }
 
+// UpdateMsgFileId 更新实际文件ID
 func (m *messageRepository) UpdateMsgFileId(tmpId string, fileId string) error {
 	if err := m.db.Model(&model.Message{}).Where("file_id = ?", tmpId).Update("file_id", fileId).Error; err != nil {
 		return err

@@ -48,7 +48,8 @@ func InitDB() {
 
 func InitTable(db *gorm.DB) {
 	log.Println("✅ Auto migrate tables")
-	err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.User{}, &model.Message{}, &model.Conversation{}, &model.File{})
+	err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&model.User{}, &model.Message{},
+		&model.Conversation{}, &model.File{}, &model.FriendRequest{}, &model.Friend{})
 	if err != nil {
 		return
 	}
