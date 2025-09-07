@@ -23,7 +23,8 @@ func (u *UserHandler) SearchByKeyword(ctx *gin.Context) {
 	if keyword == "" {
 		v1.HandleError(ctx, http.StatusBadRequest, "参数异常, 搜索关键字不能为空")
 	}
-	user, err := u.userService.GetUserByKeyword(ctx, keyword)
+	currentUserId, _ := ctx.Get("userId")
+	user, err := u.userService.GetUserByKeyword(ctx, keyword, currentUserId.(string))
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, "搜索用户失败: "+err.Error())
 		return

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	v1 "go-chat-server/api/v1"
 	"go-chat-server/internal/model"
 	"go-chat-server/pkg/db"
 	utils2 "go-chat-server/pkg/utils"
@@ -17,7 +18,7 @@ type UserRepository interface {
 	CreateUserByMail(ctx context.Context, email string, firstPwd string) (*model.User, error)
 	GetByGithubId(githubId int64) (*model.User, error)
 	CreateGithubUser(githubUser map[string]interface{}) (*model.User, error)
-	GetUserByKeyword(ctx context.Context, keyword string) (*model.User, error)
+	GetUserByKeyword(ctx context.Context, keyword string, fromId string) (*v1.AddUserResponse, error)
 }
 
 type userRepository struct {
@@ -86,12 +87,13 @@ func (r *userRepository) CreateGithubUser(githubUser map[string]interface{}) (*m
 	return user, nil
 }
 
-func (r *userRepository) GetUserByKeyword(ctx context.Context, keyword string) (*model.User, error) {
-	var user model.User
+func (r *userRepository) GetUserByKeyword(ctx context.Context, keyword string, fromId string) (*v1.AddUserResponse, error) {
+	var user v1.AddUserResponse
 	err := r.db.WithContext(ctx).
-		Select("id", "nick_name", "mail", "name", "avatar", "phone", "github_id"). // 👈 只查这几个列
+		Table("user").Select("id", "nick_name", "mail", "name", "avatar", "phone"). // 👈 只查这几个列
 		Where("nick_name = ? OR mail = ?", keyword, keyword).
-		First(&user).Error
+		Limit(1).
+		Find(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
@@ -99,5 +101,19 @@ func (r *userRepository) GetUserByKeyword(ctx context.Context, keyword string) (
 	if err != nil {
 		return nil, err
 	}
+
+	// 查询是否已经好友申请过及申请状态
+	var friendRequest model.FriendRequest
+	err1 := r.db.WithContext(ctx).Table("friend_request").Select("status", "created_at").
+		Where("from_id = ? AND to_id = ?", fromId, user.ID).
+		Order("created_at desc").
+		Limit(1).Find(&friendRequest).Error
+	if err1 != nil && !errors.Is(err1, gorm.ErrRecordNotFound) {
+		friendRequest.Status = "not-applied"
+	}
+	if friendRequest.Status == "rejected" && (utils2.GetNowTimeUnix()-friendRequest.CreatedAt) > 24*60*60*1000 {
+		friendRequest.Status = "not-applied"
+	}
+	user.Status = friendRequest.Status
 	return &user, nil
 }
