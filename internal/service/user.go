@@ -2,17 +2,11 @@ package service
 
 import (
 	"context"
-	"github.com/patrickmn/go-cache"
 	v1 "go-chat-server/api/v1"
 	"go-chat-server/internal/model"
 	"go-chat-server/internal/repo"
 	"go-chat-server/pkg/jwt"
 	"go-chat-server/pkg/utils"
-	"time"
-)
-
-var (
-	tokenCache = cache.New(2*time.Hour, 5*time.Minute)
 )
 
 type UserService interface {
