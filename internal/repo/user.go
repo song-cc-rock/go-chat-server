@@ -95,7 +95,7 @@ func (r *userRepository) GetUserByKeyword(ctx context.Context, keyword string, f
 		Limit(1).
 		Find(&user).Error
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	if user.ID == "" || errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
 	if err != nil {
@@ -108,7 +108,7 @@ func (r *userRepository) GetUserByKeyword(ctx context.Context, keyword string, f
 		Where("from_id = ? AND to_id = ?", fromId, user.ID).
 		Order("created_at desc").
 		Limit(1).Find(&friendRequest).Error
-	if err1 != nil && !errors.Is(err1, gorm.ErrRecordNotFound) {
+	if (err1 != nil && errors.Is(err1, gorm.ErrRecordNotFound)) || friendRequest.Status == "" {
 		friendRequest.Status = "not-applied"
 	}
 	if friendRequest.Status == "rejected" && (utils2.GetNowTimeUnix()-friendRequest.CreatedAt) > 24*60*60*1000 {
