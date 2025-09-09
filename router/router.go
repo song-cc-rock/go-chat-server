@@ -34,6 +34,7 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 		v1.POST("/upload", uploadHandler.Upload)
 		v1.GET("/download", uploadHandler.Download)
 		v1.POST("/friend/apply", friendHandler.ApplyFriend)
+		v1.GET("/applies", friendHandler.GetApplies)
 	}
 
 	// Chat socket routes
