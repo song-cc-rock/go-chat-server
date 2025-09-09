@@ -41,3 +41,14 @@ func (r *FriendHandler) GetApplies(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, applies)
 }
+
+// GetAccepts 获取当前用户收到的好友申请
+func (r *FriendHandler) GetAccepts(ctx *gin.Context) {
+	var accepts []*v1.FriendReqResponse
+	accepts, err := r.friendService.GetAccepts(ctx, ctx.GetString("userId"))
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+	v1.HandleSuccess(ctx, accepts)
+}

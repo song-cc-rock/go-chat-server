@@ -12,6 +12,7 @@ import (
 type FriendRepository interface {
 	ApplyFriend(ctx context.Context, friendReq *model.FriendRequest) error
 	GetApplies(ctx context.Context, fromId string) ([]*v1.FriendReqResponse, error)
+	GetAccepts(ctx context.Context, fromId string) ([]*v1.FriendReqResponse, error)
 }
 
 type friendRepository struct {
@@ -36,6 +37,20 @@ func (f *friendRepository) GetApplies(ctx context.Context, fromId string) ([]*v1
 		Select("friend_request.id, user.avatar, user.nick_name as name, friend_request.message, friend_request.status, friend_request.created_at").
 		Joins("left join user on user.id = friend_request.to_id").
 		Where("friend_request.from_id = ?", fromId).
+		Order("friend_request.created_at desc").
+		Find(&friendReqs).Error; err != nil {
+		return nil, err
+	}
+	return friendReqs, nil
+}
+
+// GetAccepts 获取当前用户收到的好友申请
+func (f *friendRepository) GetAccepts(ctx context.Context, fromId string) ([]*v1.FriendReqResponse, error) {
+	var friendReqs []*v1.FriendReqResponse
+	if err := f.db.WithContext(ctx).Model(&model.FriendRequest{}).
+		Select("friend_request.id, user.avatar, user.nick_name as name, friend_request.message, friend_request.status, friend_request.created_at").
+		Joins("left join user on user.id = friend_request.from_id").
+		Where("friend_request.to_id = ?", fromId).
 		Order("friend_request.created_at desc").
 		Find(&friendReqs).Error; err != nil {
 		return nil, err

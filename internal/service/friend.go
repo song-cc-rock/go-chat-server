@@ -10,6 +10,7 @@ import (
 type FriendService interface {
 	ApplyFriend(ctx context.Context, friendReq *model.FriendRequest) error
 	GetApplies(ctx context.Context, fromId string) ([]*v1.FriendReqResponse, error)
+	GetAccepts(ctx context.Context, fromId string) ([]*v1.FriendReqResponse, error)
 }
 
 type friendService struct {
@@ -28,4 +29,8 @@ func (f *friendService) ApplyFriend(ctx context.Context, friendReq *model.Friend
 
 func (f *friendService) GetApplies(ctx context.Context, fromId string) ([]*v1.FriendReqResponse, error) {
 	return f.friendRepo.GetApplies(ctx, fromId)
+}
+
+func (f *friendService) GetAccepts(ctx context.Context, fromId string) ([]*v1.FriendReqResponse, error) {
+	return f.friendRepo.GetAccepts(ctx, fromId)
 }
