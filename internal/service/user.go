@@ -12,6 +12,7 @@ import (
 type UserService interface {
 	IsNewUser(ctx context.Context, mail string) bool
 	RegisterNewUser(ctx context.Context, request *v1.RegisterByCodeRequest) (model.User, error)
+	UpdatePwd(ctx context.Context, mail string, newPwd string) (bool, error)
 	VerifyPwdWithToken(ctx context.Context, request *v1.LoginByPwdRequest) string
 	GetAuthUserProfile(ctx context.Context, userId string) *v1.AuthUserResponse
 	GetUserByKeyword(ctx context.Context, keyword string, formId string) (*v1.AddUserResponse, error)
@@ -39,6 +40,10 @@ func (u *userService) RegisterNewUser(ctx context.Context, request *v1.RegisterB
 		return model.User{}, err
 	}
 	return *user, nil
+}
+
+func (u *userService) UpdatePwd(ctx context.Context, mail string, newPwd string) (bool, error) {
+	return u.userRepo.UpdatePwd(ctx, mail, newPwd)
 }
 
 func (u *userService) VerifyPwdWithToken(ctx context.Context, request *v1.LoginByPwdRequest) string {

@@ -18,6 +18,7 @@ func Init(registerHandler *handler.RegisterHandler, authHandler *handler.AuthHan
 	// User registration and login routes
 	r.POST("/send-code", registerHandler.SendVerifyCode)
 	r.POST("/register", registerHandler.RegisterNewUser)
+	r.POST("/update/pwd", registerHandler.UpdatePwd)
 	r.POST("/login", registerHandler.LoginByPwd)
 	r.GET("/github/auth-url", authHandler.GetGithubAuthCodeUrl)
 	r.GET("/oauth/github", authHandler.AuthGithubAndGetToken)

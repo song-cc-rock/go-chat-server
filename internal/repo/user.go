@@ -16,6 +16,7 @@ type UserRepository interface {
 	GetByMail(ctx context.Context, email string) (*model.User, error)
 	GetById(ctx context.Context, id string) (*model.User, error)
 	CreateUserByMail(ctx context.Context, email string, firstPwd string) (*model.User, error)
+	UpdatePwd(ctx context.Context, email string, newPwd string) (bool, error)
 	GetByGithubId(githubId int64) (*model.User, error)
 	CreateGithubUser(githubUser map[string]interface{}) (*model.User, error)
 	GetUserByKeyword(ctx context.Context, keyword string, fromId string) (*v1.AddUserResponse, error)
@@ -61,6 +62,17 @@ func (r *userRepository) CreateUserByMail(ctx context.Context, email string, fir
 		return nil, fmt.Errorf("failed to create user by email: %v", err)
 	}
 	return user, nil
+}
+
+func (r *userRepository) UpdatePwd(ctx context.Context, email string, newPwd string) (bool, error) {
+	result := r.db.WithContext(ctx).Model(&model.User{}).Where("mail = ?", email).Update("password", utils2.ToHash(newPwd))
+	if result.Error != nil {
+		return false, fmt.Errorf("重置失败！")
+	}
+	if result.RowsAffected == 0 {
+		return false, fmt.Errorf("与旧密码一致！")
+	}
+	return true, nil
 }
 
 func (r *userRepository) GetByGithubId(githubId int64) (*model.User, error) {

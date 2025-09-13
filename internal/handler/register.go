@@ -60,6 +60,32 @@ func (r *RegisterHandler) RegisterNewUser(ctx *gin.Context) {
 	v1.HandleSuccess(ctx, user.NickName)
 }
 
+func (r *RegisterHandler) UpdatePwd(ctx *gin.Context) {
+	var req v1.RegisterByCodeRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, "参数异常")
+		return
+	}
+
+	if r.userService.IsNewUser(ctx, req.Mail) {
+		v1.HandleError(ctx, http.StatusBadRequest, "邮箱未注册, 请先注册")
+		return
+	}
+
+	if !r.emailService.VerifyCode(req.Mail, req.Code) {
+		v1.HandleError(ctx, http.StatusBadRequest, "验证码错误或过期")
+		return
+	}
+
+	update, err := r.userService.UpdatePwd(ctx, req.Mail, req.Password)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	v1.HandleSuccess(ctx, update)
+}
+
 func (r *RegisterHandler) LoginByPwd(ctx *gin.Context) {
 	var req v1.LoginByPwdRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
