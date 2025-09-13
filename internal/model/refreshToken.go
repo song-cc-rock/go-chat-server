@@ -9,3 +9,7 @@ type UserRefreshToken struct {
 	CreatedAt    int64  `gorm:"type:bigint;not null;"`                  // 创建时间
 	UpdatedAt    int64  `gorm:"type:bigint;not null;"`                  // 更新时间
 }
+
+func (u *UserRefreshToken) TableName() string {
+	return "refresh_token"
+}
